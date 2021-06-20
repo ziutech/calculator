@@ -1,40 +1,72 @@
-const add = (a, b) => a + b;
-const substract = (a, b) => a - b;
-const multiply = (a, b) => a * b;
-const divide = (a, b) => a / b;
-
 const operate = (a, b, operator) => {
-    switch(operator){
-        case '+':
-            return add(a, b);
-        case '-':
-            return substract(a, b);
-        case '&#215':
-            return multiply(a, b);
-        case '&#247':
-            return divide(a, b);
-    }
+	switch (operator) {
+		case "+":
+			return a + b;
+		case "-":
+			return a - b;
+		case "\u00D7":
+			return a * b;
+		case "\u00F7":
+			return a / b;
+	}
 };
 
 const display = document.querySelector(".output");
+
+let acc = null;
+let value = null;
+let sign = null;
+
+document.querySelector(".clear").addEventListener("click", () => {
+	display.textContent = 0;
+	acc = null;
+	value = null;
+	sign = null;
+});
+
+const logValues = () => console.log(acc, sign, value);
+
 const numbers = [...document.querySelectorAll(".number")];
+numbers.forEach((number) => {
+	number.addEventListener("click", () => {
+		if (value === null || display.textContent == 0)
+			display.textContent = number.textContent;
+		else display.textContent += number.textContent;
 
-let acc = 0;
-let value = 0;
+		if (!sign) acc = Number(display.textContent);
+		else value = Number(display.textContent);
 
-document.querySelector(".clear").addEventListener('click', () => {
-    display.textContent = 0;
-    acc = 0;
-    value = 0;
+		logValues();
+	});
 });
 
-numbers.forEach( (number) => {
-    number.addEventListener('click', () => {
-        if(display.textContent == 0)
-            display.textContent = number.textContent;
-        else
-            display.textContent += number.textContent;
-        value = display.textContent;
-    });
+const operators = [...document.querySelectorAll(".operator")];
+operators.forEach((operator) => {
+	operator.addEventListener("click", () => {
+		if (acc) {
+			if (!sign) {
+				sign = operator.textContent;
+				display.textContent = 0;
+				logValues();
+			} else {
+				acc = operate(acc, value, sign);
+				display.textContent = acc;
+				value = null;
+				logValues();
+				sign = operator.textContent;
+			}
+		}
+	});
 });
 
+document.querySelector(".equals").addEventListener("click", () => {
+	logValues();
+	if (acc !== null && sign !== null && value !== null) {
+		acc = operate(acc, value, sign);
+		display.textContent = acc;
+		sign = null;
+		value = null;
+		acc = null;
+		logValues();
+	}
+});
